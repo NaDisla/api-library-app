@@ -1,6 +1,6 @@
 # API Library App
 
-A simple app that consumes local .NET Core API to get data.
+A simple app that consumes local .NET Core API to get data. #4thGenLangClass
 
 | Android     | iOS |
 | :---------: | :---------: |
