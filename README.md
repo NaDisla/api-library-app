@@ -1,16 +1,7 @@
-# api_library_app
+# API Library App
 
-A new Flutter project.
+A simple app that consumes local .NET Core API to get data.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+| Android     | iOS |
+| :---------: | :---------: |
+| <img src="https://user-images.githubusercontent.com/51084681/175836535-a3fb41f6-809a-4f55-81f6-407f2539e3b5.png" width="300"/>      | <img src="https://user-images.githubusercontent.com/51084681/175836458-29d3effb-bf31-4c60-9c77-091b66ff4b9b.png" width="300"/>       |
