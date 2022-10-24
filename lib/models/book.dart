@@ -7,6 +7,7 @@ class Book {
   double totalSales;
 
   Book({
+    this.bookId,
     required this.title,
     required this.author,
     this.category,
@@ -16,6 +17,8 @@ class Book {
 
   factory Book.fromJsonCustom(Map<String, dynamic> json) {
     return Book(
+      bookId: json['bookId'],
+      catId: json['catId'],
       title: json['bookTitle'],
       author: json['bookAuthor'],
       category: json['category'],

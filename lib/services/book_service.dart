@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'services.dart';
 
 String urlGetBooks = '${Global.urlApi}books/custom_books';
-String urlBooks = '${Global.urlApi}books/';
+String urlBooks = '${Global.urlApi}books';
 
 class BookService {
   http.Client client = http.Client();
@@ -47,15 +47,38 @@ class BookService {
   }
   //**********POST METHOD*************/
 
+  //**********PUT METHOD*************/
+  Future<Book> updateBook(int id, Book bookToUpdate) async {
+    Book? updatedBook;
+    Map<String, dynamic> bookData = {
+      'bookId': id,
+      'bookTitle': bookToUpdate.title,
+      'bookAuthor': bookToUpdate.author,
+      'catId': bookToUpdate.catId,
+      'bookTotalSales': bookToUpdate.totalSales,
+    };
+    http.Response putResponse = await client.put(Uri.parse('$urlBooks/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(bookData));
+    if (putResponse.statusCode == 204) {
+      updatedBook = Book.fromJson(bookData);
+    }
+    return updatedBook!;
+  }
+  //**********PUT METHOD*************/
+
   //**********DELETE METHOD*************/
-  Future<String> deleteBook(Book remBook) async {
+  Future<String> deleteBook(int id) async {
     http.Response deleteResponse = await client.delete(
-      Uri.parse(urlBooks),
+      Uri.parse('$urlBooks/$id'),
     );
     if (deleteResponse.statusCode == 204) {
-      return deleteResponse.body;
+      return "Book deleted successfully.";
+    } else {
+      throw "Failed to delete book.";
     }
-    return deleteResponse.body;
   }
   //**********DELETE METHOD*************/
 }

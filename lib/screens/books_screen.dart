@@ -116,11 +116,64 @@ class _BooksScreenState extends State<BooksScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     TextButton(
-                                      onPressed: () {},
+                                      onPressed: () => Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                        builder: (context) => EditBookScreen(
+                                            selectedBook: data[idx]),
+                                      )),
                                       child: const Icon(Icons.edit),
                                     ),
                                     TextButton(
-                                      onPressed: () {},
+                                      onPressed: () => showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text(
+                                                  'Are you sure you want to delete this book?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    Navigator.pop(context);
+                                                    String result =
+                                                        await bookService
+                                                            .deleteBook(
+                                                                data[idx]
+                                                                    .bookId!);
+                                                    if (result.isNotEmpty) {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return AlertDialog(
+                                                              title: const Text(
+                                                                  'Book deleted successfully'),
+                                                              content:
+                                                                  const Text(
+                                                                'The book was deleted successfully. You can return and refresh the list. 🙌',
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.pop(
+                                                                          context),
+                                                                  child:
+                                                                      const Text(
+                                                                          'OK'),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          });
+                                                    }
+                                                  },
+                                                  child: const Text('YES'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: const Text('CANCEL'),
+                                                ),
+                                              ],
+                                            );
+                                          }),
                                       child: Icon(Icons.delete,
                                           color: Colors.red[900]),
                                     ),

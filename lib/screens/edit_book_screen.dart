@@ -2,21 +2,23 @@ import 'package:api_library_app/models/models.dart';
 import 'package:api_library_app/services/services.dart';
 import 'package:flutter/material.dart';
 
-class AddBookScreen extends StatefulWidget {
-  const AddBookScreen({super.key});
+class EditBookScreen extends StatefulWidget {
+  final Book selectedBook;
+  const EditBookScreen({super.key, required this.selectedBook});
 
   @override
-  State<AddBookScreen> createState() => _AddBookScreenState();
+  State<EditBookScreen> createState() => _EditBookScreenState();
 }
 
-class _AddBookScreenState extends State<AddBookScreen> {
-  GlobalKey<FormState> addFormKey = GlobalKey<FormState>();
+class _EditBookScreenState extends State<EditBookScreen> {
+  GlobalKey<FormState> editFormKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController authorController = TextEditingController();
   TextEditingController totalSalesController = TextEditingController();
   CategoryService catService = CategoryService();
   List<Category> apiCategories = [];
   int? catId;
+  Category bookCategory = Category();
   BookService bookService = BookService();
 
   Future getCategories() {
@@ -27,36 +29,46 @@ class _AddBookScreenState extends State<AddBookScreen> {
     return futureCategories;
   }
 
+  Future getCategory() {
+    Future<Category> futureCategory =
+        catService.getCategory(widget.selectedBook.catId!);
+    futureCategory.then((cat) {
+      setState(() => bookCategory = cat);
+    });
+    return futureCategory;
+  }
+
   @override
   void initState() {
     super.initState();
     getCategories();
+    getCategory();
+    nameController.text = widget.selectedBook.title;
+    authorController.text = widget.selectedBook.author;
+    totalSalesController.text = widget.selectedBook.totalSales.toString();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Book selectedBook = ModalRoute.of(context)!.settings.arguments as Book;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Book'),
+        title: Text('Editing Book: ${widget.selectedBook.title}'),
       ),
       body: Form(
-        key: addFormKey,
+        key: editFormKey,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+          padding: const EdgeInsets.all(30.0),
           child: Column(
             children: [
               TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.text_fields_rounded),
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  labelText: 'Book Title',
                   hintText: 'Book Title',
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Title is required.';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(
                 height: 20.0,
@@ -64,15 +76,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
               TextFormField(
                 controller: authorController,
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.person),
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  labelText: 'Author',
                   hintText: 'Author',
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Author is required.';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(
                 height: 20.0,
@@ -80,35 +88,38 @@ class _AddBookScreenState extends State<AddBookScreen> {
               TextFormField(
                 controller: totalSalesController,
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  labelText: 'Total Sales',
                   hintText: 'Total Sales',
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Total Sales is required.';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(
                 height: 20.0,
               ),
-              DropdownButtonFormField<Category>(
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.category_outlined),
-                  ),
-                  hint: const Text('Category'),
-                  items: apiCategories.map((cat) {
-                    return DropdownMenuItem(
-                      value: cat,
-                      child: Text(cat.catName!),
-                    );
-                  }).toList(),
-                  onChanged: (value) => setState(() {
+              apiCategories.isNotEmpty
+                  ? DropdownButtonFormField<Category>(
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                        labelText: 'Category',
+                        hintText: 'Category',
+                      ),
+                      items: apiCategories.map((cat) {
+                        return DropdownMenuItem(
+                          value: cat,
+                          child: Text(cat.catName!),
+                        );
+                      }).toList(),
+                      onChanged: (value) => setState(() {
                         catId = value!.catId;
-                      })),
+                      }),
+                      // TODO: Set initial value
+                      // value: bookCategory,
+                    )
+                  : const CircularProgressIndicator(),
               const SizedBox(
-                height: 50.0,
+                height: 30.0,
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -119,27 +130,30 @@ class _AddBookScreenState extends State<AddBookScreen> {
                       fontSize: 15.0,
                     )),
                 onPressed: () async {
-                  if (addFormKey.currentState!.validate()) {
-                    Book newBook = await bookService.createBook(Book(
-                      title: nameController.text,
-                      author: authorController.text,
-                      totalSales: double.parse(totalSalesController.text),
-                      catId: catId!,
-                    ));
-                    if (newBook.title.isNotEmpty) {
+                  if (editFormKey.currentState!.validate()) {
+                    Book updatedBook = await bookService.updateBook(
+                        widget.selectedBook.bookId!,
+                        Book(
+                          bookId: widget.selectedBook.bookId,
+                          title: nameController.text,
+                          author: authorController.text,
+                          totalSales: double.parse(totalSalesController.text),
+                          catId: catId!,
+                        ));
+                    if (updatedBook.title.isNotEmpty) {
                       showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: const Text('Book created successfully'),
+                              title: const Text('Book updated successfully'),
                               content: const Text(
-                                'The book was created successfully. You can go to home screen and refresh the list. 🙌',
+                                'The book was updated successfully. You can go to home screen and refresh the list. 🙌',
                               ),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
-                                    addFormKey.currentState!.reset();
+                                    editFormKey.currentState!.reset();
                                     nameController.clear();
                                     authorController.clear();
                                     totalSalesController.clear();
@@ -152,7 +166,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                     }
                   }
                 },
-                child: const Text('Create book'),
+                child: const Text('Save changes'),
               )
             ],
           ),
