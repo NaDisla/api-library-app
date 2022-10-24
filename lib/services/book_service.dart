@@ -42,8 +42,10 @@ class BookService {
         body: jsonEncode(bookData));
     if (postResponse.statusCode == 201) {
       createdBook = Book.fromJson(jsonDecode(postResponse.body));
+      return createdBook;
+    } else {
+      throw "Error creating book";
     }
-    return createdBook!;
   }
   //**********POST METHOD*************/
 
@@ -64,8 +66,10 @@ class BookService {
         body: jsonEncode(bookData));
     if (putResponse.statusCode == 204) {
       updatedBook = Book.fromJson(bookData);
+      return updatedBook;
+    } else {
+      throw "Error updating book";
     }
-    return updatedBook!;
   }
   //**********PUT METHOD*************/
 

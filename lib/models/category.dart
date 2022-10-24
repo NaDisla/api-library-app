@@ -1,8 +1,3 @@
-import 'dart:convert';
-
-List<Category> categoriesFromJson(String str) =>
-    List<Category>.from(json.decode(str).map((c) => Category.fromJson(c)));
-
 class Category {
   int? catId;
   String? catName;

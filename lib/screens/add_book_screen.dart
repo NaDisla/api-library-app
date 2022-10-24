@@ -1,5 +1,6 @@
 import 'package:api_library_app/models/models.dart';
 import 'package:api_library_app/services/services.dart';
+import 'package:api_library_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class AddBookScreen extends StatefulWidget {
@@ -45,51 +46,28 @@ class _AddBookScreenState extends State<AddBookScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
           child: Column(
             children: [
-              TextFormField(
+              TextFieldWidget(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.text_fields_rounded),
-                  hintText: 'Book Title',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Title is required.';
-                  }
-                  return null;
-                },
+                icon: const Icon(Icons.text_fields_rounded),
+                hintText: 'Book Title',
+                requiredText: 'Title is required.',
               ),
               const SizedBox(
                 height: 20.0,
               ),
-              TextFormField(
-                controller: authorController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.person),
+              TextFieldWidget(
+                  controller: authorController,
+                  icon: const Icon(Icons.person),
                   hintText: 'Author',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Author is required.';
-                  }
-                  return null;
-                },
-              ),
+                  requiredText: 'Author is required.'),
               const SizedBox(
                 height: 20.0,
               ),
-              TextFormField(
-                controller: totalSalesController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.monetization_on),
+              TextFieldWidget(
+                  controller: totalSalesController,
+                  icon: const Icon(Icons.monetization_on),
                   hintText: 'Total Sales',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Total Sales is required.';
-                  }
-                  return null;
-                },
-              ),
+                  requiredText: 'Total Sales is required.'),
               const SizedBox(
                 height: 20.0,
               ),
@@ -130,11 +108,10 @@ class _AddBookScreenState extends State<AddBookScreen> {
                       showDialog(
                           context: context,
                           builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Book created successfully'),
-                              content: const Text(
-                                'The book was created successfully. You can go to home screen and refresh the list. 🙌',
-                              ),
+                            return AlertWidget(
+                              title: 'Book created successfully',
+                              content:
+                                  'The book was created successfully. You can go to home screen and refresh the list. 🙌',
                               actions: [
                                 TextButton(
                                   onPressed: () {

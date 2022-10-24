@@ -1,7 +1,7 @@
-import 'package:api_library_app/models/book.dart';
+import 'package:api_library_app/models/models.dart';
 import 'package:api_library_app/screens/screens.dart';
 import 'package:api_library_app/services/services.dart';
-import 'package:api_library_app/widgets/book_detail_widget.dart';
+import 'package:api_library_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class BooksScreen extends StatefulWidget {
@@ -61,16 +61,8 @@ class _BooksScreenState extends State<BooksScreen> {
             case ConnectionState.done:
             default:
               if (snapshot.hasError) {
-                final error = snapshot.error;
-                return Center(
-                  child: Text(
-                    '$error 😢',
-                    style: const TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0),
-                  ),
-                );
+                final error = '${snapshot.error} 😢';
+                return InfoWidget(info: error, color: Colors.red);
               } else if (snapshot.data!.isNotEmpty) {
                 List<Book> data = snapshot.data!;
                 return ListView.builder(
@@ -84,101 +76,16 @@ class _BooksScreenState extends State<BooksScreen> {
                               left: 10.0, top: 5.0, bottom: 5.0),
                           child: Row(
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    data[idx].title,
-                                    style: titleStyle,
-                                  ),
-                                  const SizedBox(height: 5.0),
-                                  BookDetailWidget(
-                                      propIcon: Icons.category_rounded,
-                                      propTitle: 'Category: ',
-                                      propDetail: data[idx].category!,
-                                      propStyle: propStyle),
-                                  const SizedBox(height: 5.0),
-                                  BookDetailWidget(
-                                      propIcon: Icons.person,
-                                      propTitle: 'Author: ',
-                                      propDetail: data[idx].author,
-                                      propStyle: propStyle),
-                                  const SizedBox(height: 5.0),
-                                  BookDetailWidget(
-                                      propIcon: Icons.monetization_on,
-                                      propTitle: 'Total Sales: ',
-                                      propDetail: '${data[idx].totalSales}',
-                                      propStyle: propStyle),
-                                ],
+                              BookDataWidget(
+                                data: data,
+                                titleStyle: titleStyle,
+                                propStyle: propStyle,
+                                position: idx,
                               ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                        builder: (context) => EditBookScreen(
-                                            selectedBook: data[idx]),
-                                      )),
-                                      child: const Icon(Icons.edit),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: const Text(
-                                                  'Are you sure you want to delete this book?'),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () async {
-                                                    Navigator.pop(context);
-                                                    String result =
-                                                        await bookService
-                                                            .deleteBook(
-                                                                data[idx]
-                                                                    .bookId!);
-                                                    if (result.isNotEmpty) {
-                                                      showDialog(
-                                                          context: context,
-                                                          builder: (context) {
-                                                            return AlertDialog(
-                                                              title: const Text(
-                                                                  'Book deleted successfully'),
-                                                              content:
-                                                                  const Text(
-                                                                'The book was deleted successfully. You can return and refresh the list. 🙌',
-                                                              ),
-                                                              actions: [
-                                                                TextButton(
-                                                                  onPressed: () =>
-                                                                      Navigator.pop(
-                                                                          context),
-                                                                  child:
-                                                                      const Text(
-                                                                          'OK'),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          });
-                                                    }
-                                                  },
-                                                  child: const Text('YES'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                  child: const Text('CANCEL'),
-                                                ),
-                                              ],
-                                            );
-                                          }),
-                                      child: Icon(Icons.delete,
-                                          color: Colors.red[900]),
-                                    ),
-                                  ],
-                                ),
+                              BookActionsWidget(
+                                data: data,
+                                bookService: bookService,
+                                position: idx,
                               ),
                             ],
                           ),
@@ -186,14 +93,9 @@ class _BooksScreenState extends State<BooksScreen> {
                       );
                     });
               } else {
-                return Center(
-                  child: Text(
-                    "Ups! There aren't books 🙁",
-                    style: TextStyle(
-                        color: Colors.orange.shade900,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold),
-                  ),
+                return InfoWidget(
+                  color: Colors.orange.shade900,
+                  info: "Ups! There aren't books 🙁",
                 );
               }
           }

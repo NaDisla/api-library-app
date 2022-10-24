@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:api_library_app/models/models.dart';
 import 'package:http/http.dart' as http;
 import 'services.dart';
@@ -12,23 +11,15 @@ class CategoryService {
 
   //**********GET METHOD*************/
   Future<List<Category>> getCategories() async {
-    // List<Category> parsedCategories = [];
+    List<Category> parsedCategories = [];
     http.Response categoriesResponse = await client.get(apiUrl);
-    return categoriesFromJson(categoriesResponse.body);
 
-    // if (categoriesResponse.statusCode == 200) {
-    //   String jsonStringCategories = categoriesResponse.body;
-    //   parsedCategories = List<Category>.from(
-    //       json.decode(jsonStringCategories).map((b) => Category.fromJson(b)));
-    // }
+    if (categoriesResponse.statusCode == 200) {
+      String jsonStringCategories = categoriesResponse.body;
+      parsedCategories = List<Category>.from(
+          json.decode(jsonStringCategories).map((b) => Category.fromJson(b)));
+    }
+    return parsedCategories;
   }
   //**********GET METHOD*************/
-
-  //**********GET BY ID METHOD*************/
-  Future<Category> getCategory(int id) async {
-    http.Response categoryResponse =
-        await client.get(Uri.parse('$categoriesUrl/$id'));
-    return Category.fromJson(jsonDecode(categoryResponse.body));
-  }
-  //**********GET BY ID METHOD*************/
 }

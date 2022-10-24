@@ -1,5 +1,6 @@
 import 'package:api_library_app/models/models.dart';
 import 'package:api_library_app/services/services.dart';
+import 'package:api_library_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class EditBookScreen extends StatefulWidget {
@@ -29,20 +30,10 @@ class _EditBookScreenState extends State<EditBookScreen> {
     return futureCategories;
   }
 
-  Future getCategory() {
-    Future<Category> futureCategory =
-        catService.getCategory(widget.selectedBook.catId!);
-    futureCategory.then((cat) {
-      setState(() => bookCategory = cat);
-    });
-    return futureCategory;
-  }
-
   @override
   void initState() {
     super.initState();
     getCategories();
-    getCategory();
     nameController.text = widget.selectedBook.title;
     authorController.text = widget.selectedBook.author;
     totalSalesController.text = widget.selectedBook.totalSales.toString();
@@ -61,63 +52,56 @@ class _EditBookScreenState extends State<EditBookScreen> {
           padding: const EdgeInsets.all(30.0),
           child: Column(
             children: [
-              TextFormField(
+              TextFieldWidget(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: OutlineInputBorder(),
-                  labelText: 'Book Title',
-                  hintText: 'Book Title',
-                ),
+                hintText: 'Book Title',
+                labelText: 'Book Title',
+                isDense: true,
+                inputBorder: const OutlineInputBorder(),
+                requiredText: 'Title is required.',
               ),
               const SizedBox(
                 height: 20.0,
               ),
-              TextFormField(
+              TextFieldWidget(
                 controller: authorController,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: OutlineInputBorder(),
-                  labelText: 'Author',
-                  hintText: 'Author',
-                ),
+                hintText: 'Author',
+                labelText: 'Author',
+                isDense: true,
+                inputBorder: const OutlineInputBorder(),
+                requiredText: 'Author is required.',
               ),
               const SizedBox(
                 height: 20.0,
               ),
-              TextFormField(
+              TextFieldWidget(
                 controller: totalSalesController,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: OutlineInputBorder(),
-                  labelText: 'Total Sales',
-                  hintText: 'Total Sales',
-                ),
+                hintText: 'Total Sales',
+                labelText: 'Total Sales',
+                isDense: true,
+                inputBorder: const OutlineInputBorder(),
+                requiredText: 'Total Sales is required.',
               ),
               const SizedBox(
                 height: 20.0,
               ),
-              apiCategories.isNotEmpty
-                  ? DropdownButtonFormField<Category>(
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                        labelText: 'Category',
-                        hintText: 'Category',
-                      ),
-                      items: apiCategories.map((cat) {
-                        return DropdownMenuItem(
-                          value: cat,
-                          child: Text(cat.catName!),
-                        );
-                      }).toList(),
-                      onChanged: (value) => setState(() {
-                        catId = value!.catId;
-                      }),
-                      // TODO: Set initial value
-                      // value: bookCategory,
-                    )
-                  : const CircularProgressIndicator(),
+              DropdownButtonFormField<Category>(
+                onChanged: (value) => setState(() {
+                  catId = value!.catId;
+                }),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  labelText: 'Category',
+                  hintText: 'Category',
+                ),
+                items: apiCategories.map((cat) {
+                  return DropdownMenuItem(
+                    value: cat,
+                    child: Text(cat.catName!),
+                  );
+                }).toList(),
+              ),
               const SizedBox(
                 height: 30.0,
               ),
@@ -144,24 +128,22 @@ class _EditBookScreenState extends State<EditBookScreen> {
                       showDialog(
                           context: context,
                           builder: (context) {
-                            return AlertDialog(
-                              title: const Text('Book updated successfully'),
-                              content: const Text(
-                                'The book was updated successfully. You can go to home screen and refresh the list. 🙌',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    editFormKey.currentState!.reset();
-                                    nameController.clear();
-                                    authorController.clear();
-                                    totalSalesController.clear();
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                              ],
-                            );
+                            return AlertWidget(
+                                title: 'Book updated successfully',
+                                content:
+                                    'The book was updated successfully. You can go to home screen and refresh the list. 🙌',
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      editFormKey.currentState!.reset();
+                                      nameController.clear();
+                                      authorController.clear();
+                                      totalSalesController.clear();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ]);
                           });
                     }
                   }
